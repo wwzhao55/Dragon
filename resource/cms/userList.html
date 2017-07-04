@@ -1,0 +1,60 @@
+<div class='page-title'>用户列表 <a href="export.php?type=userList"><button class="exportBtn">导出数据</button></a></div>
+<table class="table_style" cellpadding="1" cellspacing="1">
+	<thead>
+		<tr>
+		    <th>OpenID</th>	
+			<th>姓名</th>
+			<th>手机号</th>
+			<th>QQ</th>
+			<th>联系地址</th>
+		</tr>
+	</thead>
+	<tbody id="tbody">
+
+	</tbody>
+</table>
+<div id="nodata" hidden>暂无数据</div>
+<div id="pagnation"></div>
+<script type="text/javascript">
+	$('#sider-user').addClass('active');
+	function InitList(page){
+		$.ajax({
+		    url: 'userList.php',
+		    data:{
+		    	page:page
+		    },
+		    type: 'GET',
+		    dataType:'json',
+		    success:function(data){
+		    	$('#tbody').html('');
+				if (data.status=='success') {
+					$('#nodata').hide();
+					$.each(data.data,function(key,value){        	
+		            	var openid="<td class='list_name'>"+value.openid+"</td>";
+		            	var name="<td class='list_common'>"+value.name+"</td>";
+		            	var mobile="<td class='list_common'>"+value.mobile+"</td>";
+		            	var QQ="<td class='list_edit'>"+value.QQ+"</td>";
+		            	var address="<td class='list_edit'>"+value.address+"</td>";
+		            	var content = '<tr>'+openid+name+mobile+QQ+address+'</tr>';
+		            	$('#tbody').append(content);
+					});
+					laypage({
+						cont: 'pagnation', //容器。值支持id名、原生dom对象，jquery对象,
+						pages: Math.ceil(data.count/10), //总页数
+						curr: parseInt(page+1),
+						first: false,
+						last: false,
+						jump: function(obj,first){
+							    if(!first){
+							    	InitList(parseInt(obj.curr-1));
+							    }
+						}
+					});
+				}else{
+					$('#nodata').show();
+				}
+			}
+		});
+	}
+	InitList(0);
+</script>

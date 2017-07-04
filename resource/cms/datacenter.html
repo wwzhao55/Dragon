@@ -1,0 +1,47 @@
+<!-- datacenter -->
+<div id="container">
+	<div class='page-title'>统计中心</div>
+	<table class="table_style" cellpadding="1" cellspacing="1">
+		<thead>
+			<!-- <tr>
+			    <th>奖品1</th>	
+				<th>奖品2</th>
+				<th>奖品3</th>
+				<th>奖品4</th>
+				<th>奖品5</th>
+				<th>奖品6</th>
+			</tr> -->
+		</thead>
+		<tbody id="tbody"></tbody>
+	</table>
+<div id="nodata" hidden>暂无数据</div>
+</div>
+<script type="text/javascript">
+	$('#sider-activity').addClass('active');
+	function InitList(){
+		$.ajax({
+		    url: 'datacenter.php',
+		    type: 'GET',
+		    dataType:'json',
+		    success:function(data){
+		    	$('#tbody').html('');
+				if (data.status=='success') {
+					var name ="<td>奖品名称</td>";
+					var count ="<td>剩余数量</td>";
+					for(var i=0;i<data.data.length;i++){
+						name+="<td class='list_name'>"+data.data[i].name+"</td>";
+						count+="<td class='list_name'>"+data.data[i].count+"</td>";
+					}
+					var a = '<tr>'+name+'</tr>';
+		            var b = '<tr>'+count+'</tr>';
+					$('#tbody').append(a);
+		            $('#tbody').append(b);
+				}else{
+					$('#nodata').show();
+					alert(data.message)
+				}
+			}
+		});
+	}
+	InitList();
+</script>

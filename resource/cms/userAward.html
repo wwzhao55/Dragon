@@ -1,0 +1,79 @@
+<div class='page-title'>获奖用户<a href="export.php?type=awardList"><button class="exportBtn">导出数据</button></a></div>
+<table class="table_style" cellpadding="1" cellspacing="1">
+	<thead>
+		<tr>
+		    <th>OpenID</th>	
+		    <th>手机号</th>
+			<th>奖品名称</th>
+			<th>姓名</th>
+			<th>QQ</th>
+			<th>地址</th>
+			<th>获奖时间</th>
+		</tr>
+	</thead>
+	<tbody id="tbody">
+
+	</tbody>
+</table>
+<div id="nodata" hidden>暂无数据</div>
+<div id="pagnation"></div>
+<script type="text/javascript">
+	$('#sider-award').addClass('active');
+	var height = document.getElementById("right").offsetHeight;
+	var offsetHeight = $(window).height()-60;
+	$('#left').css('height',height);
+	$('#left').css('min-height',height);
+	function InitList(page){
+		$.ajax({
+		    url: 'userAward.php',
+		    data:{
+		    	page:page
+		    },
+		    type: 'GET',
+		    dataType:'json',
+		    success:function(data){
+		    	$('#tbody').html('');
+				if (data.status=='success') {
+					$('#nodata').hide();
+					$.each(data.data,function(key,value){        	
+		            	var openid="<td>"+value.openid+"</td>";
+		            	var mobile = "<td>"+value.user_mobile+"</td>";
+		            	var awardname="<td>"+value.award_name+"</td>";
+		            	var username="<td>"+value.user_name+"</td>";
+		            	var QQ="<td>"+value.user_QQ+"</td>";
+		            	var address="<td>"+value.user_address+"</td>";
+		            	var time="<td>"+format(value.created_at)+"</td>";
+		            	var content = '<tr>'+openid+mobile+awardname+username+QQ+address+time+'</tr>';
+		            	$('#tbody').append(content);
+					});
+					laypage({ 
+						cont: 'pagnation', //容器。值支持id名、原生dom对象，jquery对象,
+						pages: Math.ceil(data.count/20), //总页数
+						curr: parseInt(page+1),
+						first: false,
+						last: false,
+						jump: function(obj,first){
+							    if(!first){
+							    	InitList(parseInt(obj.curr-1));
+							    }
+						}
+					});
+				}else{
+					$('#nodata').show();
+				}
+			}
+		});
+	}
+	InitList(0);
+	function add0(m){return m<10?'0'+m:m }
+	function format(date){
+		var time = new Date(parseInt(date*1000));
+		var y = time.getFullYear();
+		var m = time.getMonth()+1;
+		var d = time.getDate();
+		var h = time.getHours();
+		var mm = time.getMinutes();
+		var s = time.getSeconds();
+		return y+'-'+add0(m)+'-'+add0(d)+' '+add0(h)+':'+add0(mm)+':'+add0(s) ;
+	}
+</script>
